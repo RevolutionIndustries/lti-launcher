@@ -1,0 +1,15 @@
+{
+  "name": "random-lti-launcher",
+  "version": "1.0.0",
+  "description": "Povides a quick way to launch demo users into an LTI tool",
+  "main": "index.js",
+  "author": "Ian Turgeon",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "debug-logger": "^0.4.1",
+    "express": "^4.17.1",
+    "oauth-signature": "^1.5.0"
+  }
+}
