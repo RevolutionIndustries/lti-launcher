@@ -6,7 +6,7 @@ const app = require('express')()
 require('./lti-routes')(app)
 
 // some server utility borrowed from obojobo-express
-const startServer = require('./http_server.js')
+const startServer = require('./https_server')
 
 // start the server
 startServer(app, logger, process.env.PORT)
