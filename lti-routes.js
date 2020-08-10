@@ -1,5 +1,17 @@
 const sig = require('oauth-signature')
 const bodyParser = require('body-parser')
+const keys = new Map()
+
+try{
+	// KEY_JSON='{"obojobo-free-for-teachers.herokuapp.com":{"key":"WHATEVER","secret":"WHATEVER"}}'
+	const configKeys = JSON.parse(process.env.KEY_JSON)
+	for (const [key, value] of Object.entries(configKeys)){
+		keys.set(key, value)
+	}
+} catch (e){
+	console.log(e)
+	process.exit(1)
+}
 
 const randomUser = ({ instructor = false}) => {
 	const randomIntString = Math.floor(Math.random() * Math.floor(999999999)) + ''
@@ -33,22 +45,27 @@ const defaultResourceLinkId = 'random-lti-launcher-resource-link-id'
 
 // constructs a signed lti request and sends it.
 const renderLtiLaunch = (paramsIn, method, endpoint, res) => {
+	const url = new URL(endpoint)
+	if(!keys.has(url.hostname)) throw Error(`Unable to locate lti config for ${url.hostname}`)
+
+	const {key, secret} = keys.get(url.hostname)
+
 	// add the required oauth params to the given prams
 	const oauthParams = {
 		oauth_nonce: Math.round(new Date().getTime() / 1000.0),
 		oauth_timestamp: Math.round(new Date().getTime() / 1000.0),
 		oauth_callback: 'about:blank',
-		oauth_consumer_key: process.env.OAUTH_KEY,
+		oauth_consumer_key: key,
 		oauth_signature_method: 'HMAC-SHA1',
 		oauth_version: '1.0'
 	}
 	const params = { ...paramsIn, ...oauthParams }
-	const hmac_sha1 = sig.generate(method, endpoint, params, process.env.OAUTH_SECRET, '', {
+	const hmac_sha1 = sig.generate(method, endpoint, params, secret, '', {
 		encodeSignature: false
 	})
 	params['oauth_signature'] = hmac_sha1
-	const keys = Object.keys(params)
-	const htmlInput = keys
+	const paramKeys = Object.keys(params)
+	const htmlInput = paramKeys
 		.map(key => `<input type="hidden" name="${key}" value="${params[key]}"/><br/>`)
 		.join('')
 
@@ -93,6 +110,19 @@ module.exports = app => {
 			resource_link_id
 		}
 		renderLtiLaunch({ ...person, ...params }, method, decodeURIComponent(req.query.url), res)
+	})
+
+	// unknown error handler
+	app.use((err, req, res, next) => {
+		console.log(err)
+		res.set('Content-Type', 'text/html')
+		res.send(`<html>
+			<head>
+			<title>Random LTI Launcher tool Error</title>
+			</head><body>
+			<h1>Error</h1>
+			<p>${err.message}</p>
+			</body></html>`)
 	})
 
 }
