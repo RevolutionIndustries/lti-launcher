@@ -84,6 +84,7 @@ const baseUrl = req => `${req.protocol}://${req.get('host')}`
 module.exports = app => {
 	app.use(bodyParser.json({limit: "2mb"}))
 	app.use(bodyParser.urlencoded({extended: false}))
+	app.enable('trust proxy') // allows node to trust proxy headers (like on heroku)
 
 	// index page with links to all the launch types
 	app.get('/', (req, res) => {
