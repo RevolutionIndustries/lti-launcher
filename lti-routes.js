@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const keys = new Map()
 
 try{
-	// KEY_JSON='{"obojobo-free-for-teachers.herokuapp.com":{"key":"WHATEVER","secret":"WHATEVER"}}'
+	// KEY_JSON='{"url-without-protocol-or-trailing-slash.com":{"key":"lti-key","secret":"lti-secret"}}'
 	const configKeys = JSON.parse(process.env.KEY_JSON)
 	for (const [key, value] of Object.entries(configKeys)){
 		keys.set(key, value)

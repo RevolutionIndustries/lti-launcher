@@ -24,13 +24,13 @@ const normalizePort = val => {
 }
 
 const startServer = (app, logger, port = '3000', options = {}) => {
-	console.log('Note: Logging and config options can be set using environment variables.')
-	console.log(`DEBUG is set to: ${process.env.DEBUG}`)
+	logger.info('Note: Logging and config options can be set using environment variables.')
+	logger.info(`DEBUG is set to: ${process.env.DEBUG}`)
 
 	port = normalizePort(port)
 	app.set('port', port)
-	const http_or_https = options.cert ? require('https') : require('http')
-	const server = http_or_https.createServer(options, app)
+	const httpOrHttps = options.cert ? require('https') : require('http')
+	const server = httpOrHttps.createServer(options, app)
 
 	server.on('error', error => {
 		if (error.syscall !== 'listen') {
