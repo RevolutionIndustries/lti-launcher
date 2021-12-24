@@ -6,6 +6,10 @@
   "author": "Ian Turgeon",
   "license": "MIT",
   "private": false,
+	"engines": {
+		"yarn": "^1.0.0",
+		"node": "^16.0.0"
+	},
   "scripts": {
     "start": "node src/index.js"
   },
