@@ -3,7 +3,7 @@ const logger = require('debug-logger')('lti-launcher')
 const app = require('express')()
 
 // load the lti routes
-require('./lti-routes')(app)
+require('./routes/lti-routes')(app)
 
 // some server utility borrowed from obojobo-express
 const startServer = require('./https_server')

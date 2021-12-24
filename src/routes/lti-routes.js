@@ -1,5 +1,6 @@
 const sig = require('oauth-signature')
 const bodyParser = require('body-parser')
+const isTrueParam = require('../util/is-true-param')
 const keys = new Map()
 
 try{
@@ -107,9 +108,10 @@ module.exports = app => {
 			lis_outcome_service_url: 'https://example.fake/outcomes/fake',
 			lti_message_type: 'basic-lti-launch-request',
 			lti_version: 'LTI-1p0',
-			resource_link_id
+			resource_link_id,
+			score_import: isTrueParam(req.query.score_import) ? 'true' : 'false'
 		}
-		renderLtiLaunch({ ...person, ...params }, method, decodeURIComponent(req.query.url), res)
+		renderLtiLaunch({ ...ltiContext, ...person, ...params }, method, decodeURIComponent(req.query.url), res)
 	})
 
 	// unknown error handler
