@@ -1,6 +1,6 @@
 const sig = require('oauth-signature')
 const bodyParser = require('body-parser')
-const isTrueParam = require('../util/is-true-param')
+const { isTrueParam } = require('../util/is-true-param')
 const keys = new Map()
 
 try{

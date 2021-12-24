@@ -11,7 +11,8 @@
 		"node": "^16.0.0"
 	},
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "DEBUG=lti-launcher:info KEY_JSON='{\"url-without-protocol-or-trailing-slash.com\":{\"key\":\"lti-key\",\"secret\":\"lti-secret\"}}' node src/index.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
