@@ -1,7 +1,7 @@
 {
   "name": "random-lti-launcher",
   "version": "1.0.0",
-  "description": "Povides a quick way to launch demo users into an LTI tool",
+  "description": "Provides a quick way to launch demo users into an LTI tool",
   "main": "src/index.js",
   "author": "Ian Turgeon",
   "license": "MIT",
