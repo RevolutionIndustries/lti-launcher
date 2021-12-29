@@ -6,18 +6,21 @@
   "author": "Ian Turgeon",
   "license": "MIT",
   "private": false,
-	"engines": {
-		"yarn": "^1.0.0",
-		"node": "^16.0.0"
-	},
+  "engines": {
+    "yarn": "^1.0.0",
+    "node": "^16.0.0"
+  },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "DEBUG=lti-launcher:info KEY_JSON='{\"url-without-protocol-or-trailing-slash.com\":{\"key\":\"lti-key\",\"secret\":\"lti-secret\"}}' node src/index.js"
+    "dev": "DEBUG=lti-launcher:info node-dev src/index.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "debug-logger": "^0.4.1",
     "express": "^4.17.1",
     "oauth-signature": "^1.5.0"
+  },
+  "devDependencies": {
+    "node-dev": "^7.1.0"
   }
 }

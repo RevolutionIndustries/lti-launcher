@@ -1,22 +1,11 @@
 const sig = require('oauth-signature')
 const bodyParser = require('body-parser')
 const { isTrueParam } = require('../util/is-true-param')
-const keys = new Map()
+const path = require('path')
 
-try{
-	// KEY_JSON='{"url-without-protocol-or-trailing-slash.com":{"key":"lti-key","secret":"lti-secret"}}'
-	const configKeys = JSON.parse(process.env.KEY_JSON)
-	for (const [key, value] of Object.entries(configKeys)){
-		keys.set(key, value)
-	}
-} catch (e){
-	console.log(e)
-	process.exit(1)
-}
-
-const randomUser = ({ instructor = false}) => {
+const randomUser = ({ isInstructor = false}) => {
 	const randomIntString = Math.floor(Math.random() * Math.floor(999999999)) + ''
-	const typeString = instructor ? 'Instructor' : 'Learner'
+	const typeString = isInstructor ? 'Instructor' : 'Learner'
 	return {
 		lis_person_contact_email_primary: `rand-${randomIntString}@obojobo.com`,
 		lis_person_name_family: randomIntString,
@@ -45,12 +34,8 @@ const ltiContext = {
 const defaultResourceLinkId = 'random-lti-launcher-resource-link-id'
 
 // constructs a signed lti request and sends it.
-const renderLtiLaunch = (paramsIn, method, endpoint, res) => {
+const renderLtiLaunch = (paramsIn, method, key, secret, endpoint, res) => {
 	const url = new URL(endpoint)
-	if(!keys.has(url.hostname)) throw Error(`Unable to locate lti config for ${url.hostname}`)
-
-	const {key, secret} = keys.get(url.hostname)
-
 	// add the required oauth params to the given prams
 	const oauthParams = {
 		oauth_nonce: Math.round(new Date().getTime() / 1000.0),
@@ -96,15 +81,21 @@ module.exports = app => {
 			<h1>Random LTI Launcher tool</h1>
 			<p>Edit the url below to link to your module.</p>
 			<pre>${baseUrl(req)}/launch?url=https://obojobo-free-for-teachers.herokuapp.com/view/00000000-0000-0000-0000-000000000000</pre>
+			<pre>${baseUrl(req)}/launch?url=https://&lt;HOST&gt;/view/&lt;DRAFT_ID&gt;</pre>
 			<p><a href="${baseUrl(req)}/launch?url=https://obojobo-free-for-teachers.herokuapp.com/view/00000000-0000-0000-0000-000000000000">Example link</a></p>
 			</body></html>`)
+	})
+
+	app.get('/dev', (req, res) => {
+		res.set('Content-Type', 'text/html')
+		res.sendFile(path.join(__dirname+'/../templates/index.html'))
 	})
 
 	// builds a document view lti launch and submits it
 	app.get('/launch', (req, res) => {
 		const resource_link_id = req.query.resource_link_id || defaultResourceLinkId
-		const person = randomUser({instructor: false})
-		const method = 'POST'
+		const isInstructor = isTrueParam(req.query.is_instructor)
+		const person = randomUser({isInstructor})
 		const params = {
 			lis_outcome_service_url: 'https://example.fake/outcomes/fake',
 			lti_message_type: 'basic-lti-launch-request',
@@ -112,7 +103,80 @@ module.exports = app => {
 			resource_link_id,
 			score_import: isTrueParam(req.query.score_import) ? 'true' : 'false'
 		}
-		renderLtiLaunch({ ...ltiContext, ...person, ...params }, method, decodeURIComponent(req.query.url), res)
+		renderLtiLaunch({ ...ltiContext, ...person, ...params }, 'POST', req.query.lti_key, req.query.lti_secret, decodeURIComponent(req.query.url), res)
+	})
+
+	// builds a valid course navigation lti launch and submits it
+	app.get('/course_navigation', (req, res) => {
+		const resource_link_id = req.query.resource_link_id || defaultResourceLinkId
+		const isInstructor = isTrueParam(req.query.is_instructor)
+		const person = randomUser({isInstructor})
+		const params = {
+			launch_presentation_css_url: 'https://example.fake/nope.css',
+			launch_presentation_document_target: 'frame',
+			launch_presentation_locale: 'en-US',
+			launch_presentation_return_url: 'https://example.fake/fake-return.html',
+			lis_course_offering_sourcedid: 'DD-ST101',
+			lis_course_section_sourcedid: 'DD-ST101:C1',
+			lis_outcome_service_url: 'https://example.fake/outcomes/fake',
+			lis_result_sourcedid: 'UzMyOTQ0NzY6Ojo0Mjk3ODUyMjY6OjoyOTEyMw==',
+			lti_message_type: 'basic-lti-launch-request',
+			lti_version: 'LTI-1p0',
+			resource_link_id,
+			resource_link_title: 'Phone home'
+		}
+		renderLtiLaunch(
+			{ ...ltiContext, ...person, ...ltiToolConsumer, ...params },
+			'POST',
+			req.query.lti_key,
+			req.query.lti_secret,
+			decodeURIComponent(req.query.url),
+			res
+		)
+	})
+
+	// builds a valid resource selection lti launch and submits it
+	app.get('/resource_selection', (req, res) => {
+		const isInstructor = isTrueParam(req.query.is_instructor)
+		const person = randomUser({isInstructor})
+		const params = {
+			accept_copy_advice: 'false',
+			accept_media_types: '*/*',
+			accept_multiple: 'false',
+			accept_presentation_document_targets: 'embed,frame,iframe,window,popup,overlay,none',
+			accept_unsigned: 'false',
+			auto_create: 'true',
+			can_confirm: 'false',
+			content_item_return_url: `${baseUrl(req)}/return_resource_selection?test=this%20is%20a%20test`,
+			launch_presentation_css_url: 'https://example.fake/nope.css',
+			launch_presentation_locale: 'en-US',
+			lti_message_type: 'ContentItemSelectionRequest',
+			lti_version: 'LTI-1p0',
+			data: "this opaque 'data' should be sent back to the LMS!"
+		}
+		renderLtiLaunch(
+			{ ...ltiContext, ...person, ...ltiToolConsumer, ...params },
+			'POST',
+			decodeURIComponent(req.query.url),
+			res
+		)
+	})
+
+	// route that resource selections will return to
+	app.post('/return_resource_selection', (req, res) => {
+		const data = JSON.parse(req.body.content_items)
+		res.set('Content-Type', 'text/html')
+		res.send(`<html><body><h1>Resource selected!</h1>
+			<ul>
+			<li>URL: ${req.originalUrl}</li>
+			<li>lti_message_type: ${req.body.lti_message_type}</li>
+			<li>Type: ${data['@graph'][0]['@type']}</li>
+			<li>URL: ${data['@graph'][0].url}</li>
+			<li>Title: ${data['@graph'][0].title}</li>
+			<li>Data: ${req.body.data}</li>
+			</ul>
+			<code>${req.body.content_items}</code>
+			</body></html>`)
 	})
 
 	// unknown error handler

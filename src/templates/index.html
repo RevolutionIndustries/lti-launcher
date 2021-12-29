@@ -1,0 +1,105 @@
+<html>
+	<head>
+		<title>LTI Quick Launcher Tool</title>
+		<style>
+			iframe{
+				width: 620px;
+				height: 475px;
+				resize: both;
+				overflow: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>LTI Quick Launcher Tool</h1>
+		<h2>LTI Tools</h2>
+		<input id="lti_key" value="obo-production-lti-key" />
+		<input id="lti_secret" value="" />
+		<input id="launch_url" value="https://obojobo.openeducloud.com/view/00000000-0000-0000-0000-000000000000" />
+		<input id="course_nav_url" value="https://obojobo.openeducloud.com/lti/canvas/course_navigation" />
+		<input id="course_resource_selection_url" value="https://obojobo.openeducloud.com/lti/canvas/resource_selection" />
+		<ul>
+			<li><a href="/lti">LTI Instructions</a></li>
+			<li><b>LTI Course Nav:</b> (simulate LTI launch from clicking on LMS nav menu link)
+				<ul>
+					<li><a href=#" onClick="clickLink(COURSE_NAV, 'course_1', false, true);">Instructor</a></li>
+					<li><a href=#" onClick="clickLink(COURSE_NAV, 'course_1');">Student</a></li>
+				</ul>
+			</li>
+			<li><b>LTI Resource Selection:</b> (simulate LTI launch for resource/assignment selection)
+				<ul>
+					<li><a href=#" onClick="clickLink(RESOURCE_SELECTION, 'course_1', false, true);">Instructor</a></li>
+					<li><a href=#" onClick="clickLink(RESOURCE_SELECTION, 'course_1', false, false);">Student</a></li>
+				</ul>
+			</li>
+			<li><b>LTI Assignment:</b> (simulate LTI launch for an assignment)
+				<ul>
+					<li><a href="#" onClick="clickLink(ASSIGNMENT, 'course_1', false, true);" >Instructor for course_1</a></li>
+					<li><a href="#" onClick="clickLink(ASSIGNMENT, 'course_1');" >Student for course_1</a></li>
+					<li><a href="#" onClick="clickLink(ASSIGNMENT, 'course_2');">Student for course_2</a></li>
+					<li><a href="#" onClick="clickLink(ASSIGNMENT, 'course_2', true);">Student for course_2 w/ import enabled</a></li>
+				</ul>
+			</li>
+		</ul>
+		<h2>Build Tools</h2>
+		<ul>
+			<li><a href="/routes">Express Routes</a></li>
+			<li><a href="/webpack-dev-server">Webpack Dev Server Assets</a></li>
+		</ul>
+		<h2>Iframe for simulating assignment selection overlay</h2>
+		<iframe id="the-iframe"></iframe>
+
+		<script>
+			const COURSE_NAV = 'course_navigation'
+			const ASSIGNMENT = 'assignment'
+			const RESOURCE_SELECTION = 'resource_selection'
+			const ltiKey = document.getElementById('lti_key').value
+			const ltiSecret = document.getElementById('lti_secret').value
+			const launchInIframe = url => {
+				const iframeEl = document.getElementById('the-iframe')
+				iframeEl.src = url
+				iframeEl.scrollIntoView()
+			}
+
+			const clickLink = (mode, course, scoreImport = false, isInstructor = false) => {
+				let modeUrl
+				let launchInFrame = false
+				switch(mode){
+					case ASSIGNMENT:
+						modeUrl = '/launch'
+						url = document.getElementById('launch_url').value
+						break;
+
+					case COURSE_NAV:
+						modeUrl = '/course_navigation'
+						url = document.getElementById('course_nav_url').value
+						break;
+
+					case RESOURCE_SELECTION:
+						modeUrl = '/resource_selection'
+						url = document.getElementById('course_resource_selection_url').value
+						launchInFrame = true
+						break;
+				}
+
+				const params = new URLSearchParams()
+				params.append('url', url)
+				params.append('is_instructor', isInstructor ? 'true' : 'false')
+				params.append('resource_link_id', course)
+				params.append('score_import', scoreImport ? 'true' : 'false')
+				params.append('lti_key', ltiKey)
+				params.append('lti_secret', ltiSecret)
+
+				console.log({launchInFrame})
+				if(launchInFrame){
+					const iframeEl = document.getElementById('the-iframe')
+					iframeEl.src = url
+					iframeEl.scrollIntoView()
+				} else {
+					window.location.href = window.location.origin+modeUrl+'?'+params.toString();
+				}
+
+			}
+		</script>
+	</body>
+</html>
