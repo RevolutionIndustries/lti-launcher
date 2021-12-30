@@ -8,16 +8,35 @@
 				resize: both;
 				overflow: auto;
 			}
+
+			input {
+				width: 600px;
+			}
 		</style>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+		<script>
+			const randomIntString = Math.floor(Math.random() * Math.floor(999999999)) + ''
+			const typeString = isInstructor ? 'Instructor' : 'Learner'
+		</script>
 	</head>
 	<body>
 		<h1>LTI Quick Launcher Tool</h1>
 		<h2>LTI Tools</h2>
-		<input id="lti_key" value="obo-production-lti-key" />
-		<input id="lti_secret" value="" />
-		<input id="launch_url" value="https://obojobo.openeducloud.com/view/00000000-0000-0000-0000-000000000000" />
-		<input id="course_nav_url" value="https://obojobo.openeducloud.com/lti/canvas/course_navigation" />
-		<input id="course_resource_selection_url" value="https://obojobo.openeducloud.com/lti/canvas/resource_selection" />
+		LTI KEY <input id="lti_key" value="" /><br/>
+		LTI SECRET <input id="lti_secret" value="" /><br/>
+		LAUNCH URL <input id="launch_url" value="https://obojobo.openeducloud.com/view/00000000-0000-0000-0000-000000000000" /><br/>
+		COURSE NAV URL <input id="course_nav_url" value="https://obojobo.openeducloud.com/lti/canvas/course_navigation" /><br/>
+		SELECTION URL <input id="course_resource_selection_url" value="https://obojobo.openeducloud.com/lti/canvas/resource_selection" /><br/>
+
+
+		EMAIL <input id="lis_person_contact_email_primary" value="rand-555@obojobo.com" /><br/>
+		NAME <input id="lis_person_name_family" value="555" /><br/>
+		FULL NAME <input id="lis_person_name_full" value="Instructor 555" /><br/>
+		GIVEN NAME<input id="lis_person_name_given" value="Random Instructor" /><br/>
+		SOURCEDID <input id="lis_person_sourcedid" value="rand:555" /><br/>
+		ROLES <input id="roles" value="Instructor" /><br/>
+		USERID <input id="user_id" value="555" /><br/>
+
 		<ul>
 			<li><a href="/lti">LTI Instructions</a></li>
 			<li><b>LTI Course Nav:</b> (simulate LTI launch from clicking on LMS nav menu link)
@@ -61,6 +80,20 @@
 				iframeEl.scrollIntoView()
 			}
 
+			const randomUser = ({ isInstructor = false}) => {
+				const randomIntString = Math.floor(Math.random() * Math.floor(999999999)) + ''
+				const typeString = isInstructor ? 'Instructor' : 'Learner'
+				return {
+					lis_person_contact_email_primary: `rand-${randomIntString}@obojobo.com`,
+					lis_person_name_family: randomIntString,
+					lis_person_name_full: `Random ${typeString} ${randomIntString}`,
+					lis_person_name_given: `Random ${typeString}`,
+					lis_person_sourcedid: `rand:${randomIntString}`,
+					roles: typeString,
+					user_id: randomIntString,
+				}
+			}
+
 			const clickLink = (mode, course, scoreImport = false, isInstructor = false) => {
 				let modeUrl
 				let launchInFrame = false
@@ -93,7 +126,7 @@
 				console.log({launchInFrame})
 				if(launchInFrame){
 					const iframeEl = document.getElementById('the-iframe')
-					iframeEl.src = url
+					iframeEl.src = window.location.origin+modeUrl+'?'+params.toString();
 					iframeEl.scrollIntoView()
 				} else {
 					window.location.href = window.location.origin+modeUrl+'?'+params.toString();

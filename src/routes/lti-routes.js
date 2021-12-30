@@ -35,6 +35,7 @@ const defaultResourceLinkId = 'random-lti-launcher-resource-link-id'
 
 // constructs a signed lti request and sends it.
 const renderLtiLaunch = (paramsIn, method, key, secret, endpoint, res) => {
+	console.log({endpoint})
 	const url = new URL(endpoint)
 	// add the required oauth params to the given prams
 	const oauthParams = {
@@ -87,8 +88,9 @@ module.exports = app => {
 	})
 
 	app.get('/dev', (req, res) => {
-		res.set('Content-Type', 'text/html')
-		res.sendFile(path.join(__dirname+'/../templates/index.html'))
+		// res.set('Content-Type', 'text/html')
+		// res.sendFile(path.join(__dirname+'/../templates/index.html'))
+		res.render('../templates/index.ejs', {foo: 'FOO'});
 	})
 
 	// builds a document view lti launch and submits it
@@ -137,6 +139,7 @@ module.exports = app => {
 
 	// builds a valid resource selection lti launch and submits it
 	app.get('/resource_selection', (req, res) => {
+		console.log({query: req.query})
 		const isInstructor = isTrueParam(req.query.is_instructor)
 		const person = randomUser({isInstructor})
 		const params = {
@@ -157,6 +160,8 @@ module.exports = app => {
 		renderLtiLaunch(
 			{ ...ltiContext, ...person, ...ltiToolConsumer, ...params },
 			'POST',
+			req.query.lti_key,
+			req.query.lti_secret,
 			decodeURIComponent(req.query.url),
 			res
 		)
@@ -167,13 +172,14 @@ module.exports = app => {
 		const data = JSON.parse(req.body.content_items)
 		res.set('Content-Type', 'text/html')
 		res.send(`<html><body><h1>Resource selected!</h1>
+			<p>This message is shown when the LTI tool sends results back to the content_item_return_url</p>
 			<ul>
-			<li>URL: ${req.originalUrl}</li>
-			<li>lti_message_type: ${req.body.lti_message_type}</li>
-			<li>Type: ${data['@graph'][0]['@type']}</li>
-			<li>URL: ${data['@graph'][0].url}</li>
-			<li>Title: ${data['@graph'][0].title}</li>
-			<li>Data: ${req.body.data}</li>
+			<li><b>URL</b>: ${req.originalUrl}</li>
+			<li><b>lti_message_type</b>: ${req.body.lti_message_type}</li>
+			<li><b>Type</b>: ${data['@graph'][0]['@type']}</li>
+			<li><b>URL</b>: ${data['@graph'][0].url}</li>
+			<li><b>Title</b>: ${data['@graph'][0].title}</li>
+			<li><b>Data</b>: ${req.body.data}</li>
 			</ul>
 			<code>${req.body.content_items}</code>
 			</body></html>`)
