@@ -9,7 +9,7 @@
       <h3>Setup Integration</h3>
       <ul>
         <li>BASE URL: <input v-model="baseURL" placeholder="base url like https://site.com" /></li>
-        <li>LAUNCH URL: <input v-model="launchURL" placeholder="url to send lti launch to" /></li>
+        <li>ASSIGNMENT URL: <input v-model="launchURL" placeholder="url to send lti launch to" /></li>
         <li>COURSE NAV URL: <input v-model="courseNavUrl" placeholder="url to send courseNav launch to" /></li>
         <li>SELECTION URL: <input v-model="resourceSelectionUrl" placeholder="" /></li>
         <li>RESOURCE LINK ID: <input v-model="resourceLinkId" placeholder="" /></li>
@@ -83,7 +83,7 @@ const ltiToolConsumer = {
 }
 
 export default {
-  name: 'HelloWorld',
+  name: 'LaunchPad',
   data: () => ({
     method: 'POST',
     ltiKey: '',
