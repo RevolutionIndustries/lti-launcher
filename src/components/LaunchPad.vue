@@ -27,6 +27,8 @@
         <li>USERID: <input v-model="userId" placeholder="555" /></li>
         https://www.imsglobal.org/spec/lti/v1p3/#resource-link
       </ul>
+      <button @click="saveUser()">Save User</button>
+      <button @click="restoreUser()">Restore User</button>
       <h3>Generate Random User</h3>
       <button @click="randomizeUser({student: false})">Instructor</button>
       <button @click="randomizeUser({student: true})">Student</button>
@@ -36,9 +38,18 @@
     <ul>
 			<li><b>LTI Course Nav:</b> (simulate launch from LMS nav menu)
 				<ul>
-					<li><button @click="clickLink(COURSE_NAV, 'course_1');">Launch from Course Nav</button></li>
-          <li><button @click="clickLink(RESOURCE_SELECTION, 'course_1');">Launch Resource Selection</button></li>
-          <li><button @click="clickLink(ASSIGNMENT, 'course_1');">Launch Assignment</button></li>
+					<li>
+            <button @click="clickLink(COURSE_NAV, 'course_1');">Launch from Course Nav</button>
+            ({{ baseURL }}{{ launchURL }})
+          </li>
+          <li>
+              <button @click="clickLink(RESOURCE_SELECTION, 'course_1');">Launch Resource Selection</button>
+              ({{ baseURL }}{{ resourceSelectionUrl }})
+          </li>
+          <li>
+              <button @click="clickLink(ASSIGNMENT, 'course_1');">Launch Assignment</button>
+              ({{ baseURL }}{{ launchURL }})
+          </li>
 				</ul>
 			</li>
     </ul>
@@ -163,6 +174,12 @@ export default {
     }
   },
   methods: {
+    saveUser(){
+
+    },
+    restoreUser(){
+
+    },
     submit(){
       const oauthParams = {
         oauth_nonce: Math.round(new Date().getTime() / 1000.0),
