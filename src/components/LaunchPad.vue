@@ -16,6 +16,18 @@
         <li>LTI KEY: <input v-model="ltiKey" placeholder="enter an lti key" /></li>
         <li>LTI SECRET: <input v-model="ltiSecret" placeholder="enter an lti secret" /></li>
       </ul>
+
+      <button @click="saveConfig()">Save This Config</button>
+      <button v-if="savedConfigs.length" @click="showConfigList()">Restore A Saved Config</button>
+      <div v-if="showConfigs" name="my-first-modal">
+        <div v-for="(value, index) in savedConfigs" v-bind:key="index">
+          {{ value.baseURL }}
+          <button @click="restoreConfig(value)">Restore</button>
+          <button @click="deleteConfig(index)">Delete</button>
+        </div>
+        <button @click="hideConfigList()">Close</button>
+      </div>
+
       <h4>Setup User</h4>
       <ul>
         <li>EMAIL: <input v-model="email" placeholder="user email" /></li>
@@ -27,7 +39,7 @@
         <li>USERID: <input v-model="userId" placeholder="555" /></li>
       </ul>
       <button @click="saveUser()">Save This User</button>
-      <button @click="showUserList()">Restore A Saved User</button>
+      <button v-if="savedUsers.length" @click="showUserList()">Restore A Saved User</button>
 
       <div v-if="showUsers" name="my-first-modal">
         <div v-for="(value, index) in savedUsers" v-bind:key="index">
@@ -36,7 +48,6 @@
           <button @click="deleteUser(index)">Delete</button>
         </div>
         <button @click="hideUserList()">Close</button>
-
       </div>
 
       <h3>Generate Random User</h3>
@@ -124,7 +135,9 @@ export default {
     endpoint: null,
     params: {},
     showUsers: false,
-    savedUsers: []
+    savedUsers: [],
+    showConfigs: false,
+    savedConfigs: [],
   }),
   props: {
     msg: String
@@ -142,6 +155,7 @@ export default {
     })
 
     if(localStorage.savedUsers) this.savedUsers = JSON.parse(localStorage.savedUsers)
+    if(localStorage.savedConfigs) this.savedConfigs = JSON.parse(localStorage.savedConfigs)
   },
   watch: {
     ltiKey(newVal) {
@@ -188,6 +202,43 @@ export default {
     }
   },
   methods: {
+    saveConfig(){
+      this.savedConfigs.push({
+        baseURL: this.baseURL,
+        launchURL: this.launchURL,
+        courseNavUrl: this.courseNavUrl,
+        resourceSelectionUrl: this.resourceSelectionUrl,
+        resourceLinkId: this.resourceLinkId,
+        ltiKey: this.ltiKey,
+        ltiSecret: this.ltiSecret,
+      })
+
+      localStorage.savedConfigs = JSON.stringify(this.savedConfigs)
+    },
+
+    showConfigList(){
+      this.showConfigs = true
+    },
+
+    hideConfigList(){
+      this.showConfigs = false
+    },
+
+    restoreConfig(config){
+      this.baseURL = config.baseURL
+      this.launchURL = config.launchURL
+      this.courseNavUrl = config.courseNavUrl
+      this.resourceSelectionUrl = config.resourceSelectionUrl
+      this.resourceLinkId = config.resourceLinkId
+      this.ltiKey = config.ltiKey
+      this.ltiSecret = config.ltiSecret
+    },
+
+    deleteConfig(index){
+      this.savedConfigs.splice(index, 1)
+      localStorage.savedConfigs = JSON.stringify(this.savedConfigs)
+    },
+
     saveUser(){
       this.savedUsers.push({
         email: this.email,
