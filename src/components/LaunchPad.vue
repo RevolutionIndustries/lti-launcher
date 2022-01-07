@@ -25,10 +25,20 @@
         <li>SOURCEDID: <input v-model="sourcedId" placeholder="rand:555" /></li>
         <li>ROLES: <input v-model="roles" placeholder="Instructor" /></li>
         <li>USERID: <input v-model="userId" placeholder="555" /></li>
-        https://www.imsglobal.org/spec/lti/v1p3/#resource-link
       </ul>
-      <button @click="saveUser()">Save User</button>
-      <button @click="restoreUser()">Restore User</button>
+      <button @click="saveUser()">Save This User</button>
+      <button @click="showUserList()">Restore A Saved User</button>
+
+      <div v-if="showUsers" name="my-first-modal">
+        <div v-for="(value, index) in savedUsers" v-bind:key="index">
+          {{ value.fullName }}
+          <button @click="restoreUser(value)">Restore</button>
+          <button @click="deleteUser(index)">Delete</button>
+        </div>
+        <button @click="hideUserList()">Close</button>
+
+      </div>
+
       <h3>Generate Random User</h3>
       <button @click="randomizeUser({student: false})">Instructor</button>
       <button @click="randomizeUser({student: true})">Student</button>
@@ -112,7 +122,9 @@ export default {
     roles: '',
     userId: '',
     endpoint: null,
-    params: {}
+    params: {},
+    showUsers: false,
+    savedUsers: []
   }),
   props: {
     msg: String
@@ -128,6 +140,8 @@ export default {
     syncKeys.forEach(key => {
       if(localStorage[key]) this[key] = localStorage[key];
     })
+
+    if(localStorage.savedUsers) this.savedUsers = JSON.parse(localStorage.savedUsers)
   },
   watch: {
     ltiKey(newVal) {
@@ -175,11 +189,42 @@ export default {
   },
   methods: {
     saveUser(){
+      this.savedUsers.push({
+        email: this.email,
+        familyName: this.familyName,
+        fullName: this.fullName,
+        givenName: this.givenName,
+        sourcedId: this.sourcedId,
+        roles: this.roles,
+        userId: this.userId,
+      })
 
+      localStorage.savedUsers = JSON.stringify(this.savedUsers)
     },
-    restoreUser(){
 
+    showUserList(){
+      this.showUsers = true
     },
+
+    restoreUser(user){
+        this.email = user.email
+        this.familyName = user.familyName
+        this.fullName = user.fullName
+        this.givenName = user.givenName
+        this.sourcedId = user.sourcedId
+        this.roles = user.roles
+        this.userId = user.userId
+    },
+
+    deleteUser(index){
+      this.savedUsers.splice(index, 1)
+      localStorage.savedUsers = JSON.stringify(this.savedUsers)
+    },
+
+    hideUserList(){
+      this.showUsers = false
+    },
+
     submit(){
       const oauthParams = {
         oauth_nonce: Math.round(new Date().getTime() / 1000.0),
@@ -214,6 +259,7 @@ export default {
       });
 
     },
+
     randomizeUser({student = false}) {
       const randomIntString = Math.floor(Math.random() * Math.floor(999999999)) + ''
       const typeString = student ? 'Learner' : 'Instructor'
@@ -226,6 +272,7 @@ export default {
       localStorage.roles = this.roles = typeString
       localStorage.userId = this.userId = randomIntString
     },
+
     clickLink(mode, course, scoreImport = false) {
       // let modeUrl
       // let launchInFrame = false
