@@ -11,7 +11,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "start": "node src/index.js",
-    "publish": "push-dir --dir=dist --branch=gh-pages"
+    "publish-ghpages": "push-dir --dir=dist --branch=gh-pages"
   },
   "main": "src/index.js",
   "dependencies": {
