@@ -56,6 +56,6 @@
     "yarn": "^1.0.0",
     "node": "^16.0.0"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "readme": "ERROR: No README data found!"
 }
