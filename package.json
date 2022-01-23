@@ -10,7 +10,8 @@
     "dev": "DEBUG=lti-launcher:info vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "publish": "push-dir --dir=dist --branch=gh-pages"
   },
   "main": "src/index.js",
   "dependencies": {
@@ -19,6 +20,7 @@
     "debug-logger": "^0.4.1",
     "express": "^4.17.1",
     "oauth-signature": "^1.5.0",
+    "push-dir": "^0.4.1",
     "vue": "^3.0.0"
   },
   "devDependencies": {
