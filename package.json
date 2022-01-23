@@ -1,23 +1,61 @@
 {
   "name": "random-lti-launcher",
   "version": "1.0.0",
-  "description": "Provides a quick way to launch demo users into an LTI tool",
-  "main": "src/index.js",
-  "author": "Ian Turgeon",
-  "license": "MIT",
   "private": false,
-	"engines": {
-		"yarn": "^1.0.0",
-		"node": "^16.0.0"
-	},
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "DEBUG=lti-launcher:info KEY_JSON='{\"url-without-protocol-or-trailing-slash.com\":{\"key\":\"lti-key\",\"secret\":\"lti-secret\"}}' node src/index.js"
+  "description": "Provides a quick way to launch demo users into an LTI tool",
+  "author": {
+    "name": "Ian Turgeon"
   },
+  "scripts": {
+    "dev": "DEBUG=lti-launcher:info vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "start": "node src/index.js",
+    "publish-ghpages": "push-dir --dir=dist --branch=gh-pages"
+  },
+  "main": "src/index.js",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "core-js": "^3.6.5",
     "debug-logger": "^0.4.1",
     "express": "^4.17.1",
-    "oauth-signature": "^1.5.0"
-  }
+    "oauth-signature": "^1.5.0",
+    "push-dir": "^0.4.1",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "_id": "random-lti-launcher@1.0.0",
+  "engines": {
+    "yarn": "^1.0.0",
+    "node": "^16.0.0"
+  },
+  "license": "MIT",
+  "readme": "ERROR: No README data found!"
 }

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+
 const logger = require('debug-logger')('lti-launcher')
-const app = require('express')()
+const express = require('express')
+const app = express()
 
 // load the lti routes
 require('./routes/lti-routes')(app)
