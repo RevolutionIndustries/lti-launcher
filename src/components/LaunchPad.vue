@@ -1,84 +1,113 @@
 <template>
-  <div class="hello">
-    <h1>LTI Launchpad</h1>
-    <p>
-      Open source tools for developers and admins working with Learning Tools Interoperability systems.
-    </p>
+  <div class="homepage">
 
-    <div class="setup">
-      <h3>Setup Integration</h3>
-      <ul>
-        <li>BASE URL: <input v-model="baseURL" placeholder="base url like https://site.com" /></li>
-        <li>ASSIGNMENT URL: <input v-model="launchURL" placeholder="url to send lti launch to" /></li>
-        <li>COURSE NAV URL: <input v-model="courseNavUrl" placeholder="url to send courseNav launch to" /></li>
-        <li>SELECTION URL: <input v-model="resourceSelectionUrl" placeholder="" /></li>
-        <li>RESOURCE LINK ID: <input v-model="resourceLinkId" placeholder="" /></li>
-        <li>LTI KEY: <input v-model="ltiKey" placeholder="enter an lti key" /></li>
-        <li>LTI SECRET: <input v-model="ltiSecret" placeholder="enter an lti secret" /></li>
-      </ul>
+    <header class="intro">
+      <h1>LTI Launchpad</h1>
+      <p>
+        Open source tools for developers and admins working with Learning Tools Interoperability systems.
+      </p>
 
-      <button @click="saveConfig()">Save This Config</button>
-      <button v-if="savedConfigs.length" @click="showConfigList()">Restore A Saved Config</button>
-      <div v-if="showConfigs" name="my-first-modal">
-        <div v-for="(value, index) in savedConfigs" v-bind:key="index">
-          {{ value.baseURL }}
-          <button @click="restoreConfig(value)">Restore</button>
-          <button @click="deleteConfig(index)">Delete</button>
+      <p>
+        Privacy: No credentials are stored on the server, they're all stored locally in your browser.  Furthermore, this tool is open source for transparency's sake.
+      </p>
+    </header>
+
+    <section id="setup">
+      <div id="setup-integration" class="form-container">
+        <h3>Setup Integration</h3>
+        <ul>
+          <li>BASE URL: <input v-model="baseURL" placeholder="base url like https://site.com" /></li>
+          <li>ASSIGNMENT URL: <input v-model="launchURL" placeholder="url to send lti launch to" /></li>
+          <li>COURSE NAV URL: <input v-model="courseNavUrl" placeholder="url to send courseNav launch to" /></li>
+          <li>SELECTION URL: <input v-model="resourceSelectionUrl" placeholder="" /></li>
+          <li>RESOURCE LINK ID: <input v-model="resourceLinkId" placeholder="" /></li>
+          <li>LTI KEY: <input v-model="ltiKey" placeholder="enter an lti key" /></li>
+          <li>LTI SECRET: <input v-model="ltiSecret" placeholder="enter an lti secret" /></li>
+        </ul>
+        <div class="button-group">
+          <button class="action" @click="saveConfig()">Save Config</button>
+          <button class="action" v-if="savedConfigs.length" @click="toggleConfigList()">Restore Config...</button>
         </div>
-        <button @click="hideConfigList()">Close</button>
+        <div v-if="showConfigs" name="my-first-modal">
+          <div v-for="(value, index) in savedConfigs" v-bind:key="index">
+            {{ value.baseURL }}
+            <button @click="restoreConfig(value)">Restore</button>
+            <button @click="deleteConfig(index)">Delete</button>
+          </div>
+          <div class="button-group">
+            <button class="close action"  @click="toggleConfigList()">Close</button>
+          </div>
+        </div>
       </div>
 
-      <h4>Setup User</h4>
-      <ul>
-        <li>EMAIL: <input v-model="email" placeholder="user email" /></li>
-        <li>NAME: <input v-model="familyName" placeholder="user last name" /></li>
-        <li>FULL NAME: <input v-model="fullName" placeholder="user full name" /></li>
-        <li>GIVEN NAME: <input v-model="givenName" placeholder="Random Instructor" /></li>
-        <li>SOURCEDID: <input v-model="sourcedId" placeholder="rand:555" /></li>
-        <li>ROLES: <input v-model="roles" placeholder="Instructor" /></li>
-        <li>USERID: <input v-model="userId" placeholder="555" /></li>
-      </ul>
-      <button @click="saveUser()">Save This User</button>
-      <button v-if="savedUsers.length" @click="showUserList()">Restore A Saved User</button>
+      <div id="setup-user" class="form-container">
+        <h3>Setup User</h3>
+        <ul>
+          <li>EMAIL: <input v-model="email" placeholder="user email" /></li>
+          <li>NAME: <input v-model="familyName" placeholder="user last name" /></li>
+          <li>FULL NAME: <input v-model="fullName" placeholder="user full name" /></li>
+          <li>GIVEN NAME: <input v-model="givenName" placeholder="Random Instructor" /></li>
+          <li>SOURCEDID: <input v-model="sourcedId" placeholder="rand:555" /></li>
+          <li>ROLES: <input v-model="roles" placeholder="Instructor" /></li>
+          <li>USERID: <input v-model="userId" placeholder="555" /></li>
+        </ul>
 
-      <div v-if="showUsers" name="my-first-modal">
-        <div v-for="(value, index) in savedUsers" v-bind:key="index">
-          {{ value.fullName }}
-          <button @click="restoreUser(value)">Restore</button>
-          <button @click="deleteUser(index)">Delete</button>
+        <p>Generate a random:
+        <button @click="randomizeUser({student: false})">Instructor</button>
+        or
+        <button @click="randomizeUser({student: true})">Student</button>
+        </p>
+
+        <div class="button-group">
+          <button class="action" @click="saveUser()">Save User</button>
+          <button class="action" v-if="savedUsers.length" @click="toggleUserList()">Restore User...</button>
         </div>
-        <button @click="hideUserList()">Close</button>
+
+        <div v-if="showUsers" name="my-first-modal">
+          <div v-for="(value, index) in savedUsers" v-bind:key="index">
+            {{ value.fullName }}
+            <button @click="restoreUser(value)">Restore</button>
+            <button @click="deleteUser(index)">Delete</button>
+          </div>
+          <div class="button-group">
+            <button class="action close" @click="toggleUserList()">Close</button>
+          </div>
+        </div>
+
       </div>
+    </section>
 
-      <h3>Generate Random User</h3>
-      <button @click="randomizeUser({student: false})">Instructor</button>
-      <button @click="randomizeUser({student: true})">Student</button>
-    </div>
+    <section id="launch">
+      <div class="form-container">
+        <h3>Launch</h3>
 
-    <h3>Launch</h3>
-    <ul>
-			<li><b>LTI Course Nav:</b> (simulate launch from LMS nav menu)
-				<ul>
-					<li>
-            <button @click="clickLink(COURSE_NAV, 'course_1');">Launch from Course Nav</button>
-            ({{ baseURL }}{{ launchURL }})
-          </li>
-          <li>
-              <button @click="clickLink(RESOURCE_SELECTION, 'course_1');">Launch Resource Selection</button>
-              ({{ baseURL }}{{ resourceSelectionUrl }})
-          </li>
-          <li>
-              <button @click="clickLink(ASSIGNMENT, 'course_1');">Launch Assignment</button>
-              ({{ baseURL }}{{ launchURL }})
-          </li>
-				</ul>
-			</li>
-    </ul>
+        <div class="launch-group">
+          <button class="action launch" @click="clickLink(COURSE_NAV, 'course_1');">Launch Course Nav</button>
+          Simulate a nav menu LTI launch.
+          <div class="small-detail">url: {{ baseURL }}{{ launchURL }}</div>
+        </div>
 
-    <h3>By us. For Everyone.</h3>
-    <p>
-      Created by OpenEduCloud &amp; the founding people behind Obojoob &amp; Materia.
-    </p>
+        <div class="launch-group">
+          <button class="action launch" @click="clickLink(RESOURCE_SELECTION, 'course_1');">Launch Resource Selection</button>
+          Simulate choosing a resource to place in a course.
+          <div class="small-detail">url: {{ baseURL }}{{ resourceSelectionUrl }}</div>
+        </div>
+
+        <div class="launch-group">
+          <button class="action launch" @click="clickLink(ASSIGNMENT, 'course_1');">Launch Assignment</button>
+          Simulate starting an assignment in a course.
+          <div class="small-detail">url: {{ baseURL }}{{ launchURL }}</div>
+        </div>
+
+     </div>
+    </section>
+
+    <footer>
+      <h3>By us. For Everyone.</h3>
+      <p>
+        Created by <a href="https://openeducloud.com/">OpenEduCloud</a> &amp; the founding people behind <a href="https://ucfopen.github.io/">Obojobo &amp; Materia</a>.
+      </p>
+    </footer>
 
     <form ref="form" v-bind:method="method" v-bind:action="endpoint" v-bind:target="launchURL">
         <input
@@ -216,12 +245,8 @@ export default {
       localStorage.savedConfigs = JSON.stringify(this.savedConfigs)
     },
 
-    showConfigList(){
-      this.showConfigs = true
-    },
-
-    hideConfigList(){
-      this.showConfigs = false
+    toggleConfigList(){
+      this.showConfigs = ! this.showConfigs
     },
 
     restoreConfig(config){
@@ -237,6 +262,7 @@ export default {
     deleteConfig(index){
       this.savedConfigs.splice(index, 1)
       localStorage.savedConfigs = JSON.stringify(this.savedConfigs)
+      if(this.savedConfigs.length < 1) this.showConfigs = false
     },
 
     saveUser(){
@@ -253,8 +279,8 @@ export default {
       localStorage.savedUsers = JSON.stringify(this.savedUsers)
     },
 
-    showUserList(){
-      this.showUsers = true
+    toggleUserList(){
+      this.showUsers = ! this.showUsers
     },
 
     restoreUser(user){
@@ -270,10 +296,7 @@ export default {
     deleteUser(index){
       this.savedUsers.splice(index, 1)
       localStorage.savedUsers = JSON.stringify(this.savedUsers)
-    },
-
-    hideUserList(){
-      this.showUsers = false
+      if(this.savedUsers.length < 1) this.showUsers = false
     },
 
     submit(){
@@ -406,26 +429,87 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+
+header {
+  margin-bottom: 3em;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
 
-.setup{
+.form-container {
   max-width: 600px;
-  margin: 0 auto;
+  padding: 1em 1.2em;
+  margin: 1em auto 3em auto;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 1em;
+  box-sizing: border-box;
 }
 
-.setup ul{
+.form-container ul{
   width:100%;
   text-align: left;
 }
 
-.setup input {
-  width: 400px;
+.form-container ul li{
+  margin-bottom: .3em;
+}
+
+.form-container input {
+  width: 380px;
+  border: 1px solid #ccc;
+  padding: .3em;
+}
+
+.form-container h3:first-of-type {
+  font-size: 1.5em;
+  margin: 0 auto;
+  margin-top: -1.5em;
+  background-color: rgba(255,255,255,.5);
+  width: 70%;
+}
+
+button.action {
+  padding: 1em;
+  margin: 1em;
+  border: 0;
+  border-radius: .5em;
+  background-color: #1181b7;
+  color: white;
+  font-weight: bold;
+}
+
+button.launch:before {
+  content: "🚀 ";
+}
+
+button.close{
+  background-color: #889095;
+}
+
+button.close:before{
+  color: #ffdada;
+  content: "✖ ";
+}
+
+.launch-group {
+  margin-top: 1.5em;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  padding-bottom: 1em;
+}
+.launch-group:last-of-type {
+  border-bottom:0;
+}
+
+.launch-group button{
+  display: block;
+  margin: 1em auto;
+}
+
+.small-detail {
+  font-size: .8em;
 }
 
 a {
