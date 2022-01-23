@@ -8,7 +8,7 @@
       </p>
 
       <p>
-        Privacy: No credentials are stored on the server, they're all stored locally in your browser.  Furthermore, this tool is open source for transparency's sake.
+        Privacy: No credentials are stored on the server, they're all stored locally in your browser.  Furthermore, this tool is <a href="https://github.com/RevolutionIndustries/lti-launcher">open source</a>.
       </p>
     </header>
 
